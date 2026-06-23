@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TETZ2026 - Öğrencileri ilgi alanlarına göre akıllıca eşleştiren networking platformu" />
+  <title>TETZ2026 — Öğrenci Networking Platformu</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="app-header">
+      <h1>TETZ2026</h1>
+      <p class="tagline">İlgi alanlarına göre akıllı öğrenci eşleştirme</p>
+    </header>
+
+    <main>
+      <div id="map-container"></div>
+      <div id="content-area"></div>
+    </main>
+
+    <footer id="stats-bar"></footer>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      getDocs,
+      setDoc,
+      addDoc,
+      updateDoc,
+      query,
+      where,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getAuth,
+      signInAnonymously,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_w65kktgOnE2AUDQDU4OmoRmiYUvXfhg",
+      authDomain: "tetz2026.firebaseapp.com",
+      projectId: "tetz2026",
+      storageBucket: "tetz2026.firebasestorage.app",
+      messagingSenderId: "87940983220",
+      appId: "1:87940983220:web:b38e5f28ace0576df06ae1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    window.tetz = {
+      app,
+      db,
+      auth,
+      firestore: {
+        collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
+        query, where, onSnapshot, serverTimestamp
+      },
+      authApi: { signInAnonymously, onAuthStateChanged }
+    };
+  </script>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
