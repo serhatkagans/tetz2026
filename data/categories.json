@@ -70,5 +70,35 @@
     "name": "E-Spor",
     "icon": "🕹️",
     "color": "#DC2626"
+  },
+  {
+    "id": "bilgisayar-olimpiyatlari",
+    "name": "Bilgisayar Olimpiyatları",
+    "icon": "🏆",
+    "color": "#F59E0B"
+  },
+  {
+    "id": "bilisim-hukuku",
+    "name": "Bilişim Hukuku",
+    "icon": "⚖️",
+    "color": "#6366F1"
+  },
+  {
+    "id": "meb-robot",
+    "name": "MEB Robot",
+    "icon": "🤖",
+    "color": "#EF4444"
+  },
+  {
+    "id": "teknofest",
+    "name": "Teknofest",
+    "icon": "🚀",
+    "color": "#0EA5E9"
+  },
+  {
+    "id": "dijital-sanatlar",
+    "name": "Dijital Sanatlar",
+    "icon": "🎨",
+    "color": "#EC4899"
   }
 ]
