@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:tetz2026.web.app)"
+    ]
+  }
+}
