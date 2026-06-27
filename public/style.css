@@ -227,6 +227,108 @@ textarea:focus {
   margin-top: 12px;
 }
 
+/* Öğrenci kartları (components/cards.js) */
+.student-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--gap);
+}
+
+.student-list-empty {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 32px 16px;
+  font-size: 14px;
+}
+
+.student-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.student-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.student-card__body {
+  flex: 1;
+  padding: 18px;
+}
+
+.student-card__name {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.student-card__school {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.student-card__label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.student-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.student-card__no-interests {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.interest-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--chip-color, var(--primary)) 18%, transparent);
+  color: var(--chip-color, var(--primary));
+  border: 1px solid color-mix(in srgb, var(--chip-color, var(--primary)) 35%, transparent);
+}
+
+.interest-chip--fallback {
+  --chip-color: var(--text-muted);
+}
+
+.interest-chip__icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.student-card__footer {
+  padding: 12px 18px 18px;
+}
+
+.student-card__btn {
+  width: 100%;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
 @media (max-width: 800px) {
   main {
     grid-template-columns: 1fr;
@@ -236,5 +338,8 @@ textarea:focus {
   }
   .eslesme-kart__ust {
     flex-direction: column;
+  }
+  .student-grid {
+    grid-template-columns: 1fr;
   }
 }
