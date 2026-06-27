@@ -1,6 +1,7 @@
 import { renderOneriler, eslesmeleriKaydet } from "./components/matching.js";
 import { FuarKatPlani } from "./components/map.js";
 import { renderStats as renderStatsCards } from "./components/stats.js";
+import { renderModerasyon } from "./components/moderation.js";
 
 const { db, auth, firestore, authApi } = window.tetz;
 const {
@@ -108,7 +109,48 @@ function subscribeMatches() {
   });
 }
 
+// Router ve navigasyon yönetimi
+function handleRoute() {
+  const modBtn = document.getElementById("nav-btn-mod");
+  if (window.location.hash === "#moderasyon") {
+    if (modBtn) modBtn.textContent = "Ana Sayfa";
+    renderModerasyon("content-area");
+  } else {
+    if (modBtn) modBtn.textContent = "Moderatör Paneli";
+    renderContent();
+  }
+}
+
+window.addEventListener("hashchange", handleRoute);
+
+// Header'a navigasyon butonunun eklenmesi
+function setupNavigation() {
+  const header = document.getElementById("app-header");
+  if (header) {
+    header.style.display = "flex";
+    header.style.justifyContent = "space-between";
+    header.style.alignItems = "center";
+
+    const navDiv = document.createElement("div");
+    navDiv.innerHTML = `
+      <button id="nav-btn-mod" style="background: var(--surface-2); border: 1px solid var(--border); color: var(--text);">Moderatör Paneli</button>
+    `;
+    header.appendChild(navDiv);
+
+    const modBtn = navDiv.querySelector("#nav-btn-mod");
+    modBtn.addEventListener("click", () => {
+      if (window.location.hash === "#moderasyon") {
+        window.location.hash = "";
+      } else {
+        window.location.hash = "#moderasyon";
+      }
+    });
+  }
+}
+
 async function init() {
+  setupNavigation();
+
   try {
     state.categories = await loadCategories();
   } catch (err) {
@@ -133,7 +175,7 @@ async function init() {
   });
 
   await renderMap();
-  renderContent();
+  handleRoute();
   renderStats();
 }
 

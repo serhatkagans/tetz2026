@@ -145,3 +145,6 @@ vite.config.ts.timestamp-*
 # Arşiv dosyaları (repoya dahil edilmez)
 *.rar
 *.zip
+
+# OS dosyaları
+.DS_Store
