@@ -1,4 +1,5 @@
 import { renderOneriler, eslesmeleriKaydet } from "./components/matching.js";
+import { FuarKatPlani } from "./components/map.js";
 
 const { db, auth, firestore, authApi } = window.tetz;
 const {
@@ -39,6 +40,7 @@ function renderStats() {
     <span><strong>${total}</strong> öğrenci</span>
     <span><strong>${approved}</strong> onaylı</span>
     <span><strong>${matchCount}</strong> eşleşme</span>
+    <span><strong>${state.categories.length}</strong> ilgi alanı</span>
   `;
 }
 
@@ -78,8 +80,24 @@ function renderContent() {
   `;
 }
 
-function renderMap() {
-  els.map.innerHTML = `<div class="map-placeholder">Harita alanı</div>`;
+async function renderMap() {
+  try {
+    await FuarKatPlani("map-container");
+  } catch (err) {
+    console.error("Harita hatası:", err);
+    if (els.map) {
+      els.map.innerHTML = `
+        <div class="hata-mesaji">
+          <p><strong>Harita yüklenemedi</strong></p>
+          <p>${err.message || "Bilinmeyen hata"}</p>
+          <p class="hata-mesaji__ipucu">
+            index.html dosyasını doğrudan açma — bir sunucu üzerinden aç:
+            <code>firebase serve</code> veya VS Code Live Server
+          </p>
+        </div>
+      `;
+    }
+  }
 }
 
 function subscribeStudents() {
@@ -121,7 +139,7 @@ async function init() {
     maybeShowOneriler();
   });
 
-  renderMap();
+  await renderMap();
   renderContent();
   renderStats();
 }

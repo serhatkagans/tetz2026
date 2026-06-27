@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:tetz2026.web.app)"
+      "WebFetch(domain:tetz2026.web.app)",
+      "PowerShell(git branch *)",
+      "PowerShell(git show *)",
+      "PowerShell(git diff *)"
     ]
   }
 }
