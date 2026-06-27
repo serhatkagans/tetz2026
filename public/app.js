@@ -1,3 +1,5 @@
+import { renderOneriler, eslesmeleriKaydet } from "./components/matching.js";
+
 const { db, auth, firestore, authApi } = window.tetz;
 const {
   collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
@@ -40,7 +42,33 @@ function renderStats() {
   `;
 }
 
+function getCurrentOgrenciId() {
+  if (!state.user) return null;
+  const ogrenci = state.students.find((s) => s.id === state.user.uid);
+  return ogrenci?.id ?? null;
+}
+
+let onerilerYuklendi = false;
+
+async function showOneriler(ogrenciId) {
+  if (!ogrenciId || onerilerYuklendi) return;
+  onerilerYuklendi = true;
+  try {
+    await eslesmeleriKaydet(ogrenciId);
+    await renderOneriler("content-area", ogrenciId);
+  } catch (err) {
+    onerilerYuklendi = false;
+    console.error("Eşleşme önerileri yüklenemedi:", err);
+  }
+}
+
+function maybeShowOneriler() {
+  const ogrenciId = getCurrentOgrenciId();
+  if (ogrenciId) showOneriler(ogrenciId);
+}
+
 function renderContent() {
+  if (getCurrentOgrenciId()) return;
   els.content.innerHTML = `
     <section class="welcome">
       <h2>Hoş geldin!</h2>
@@ -58,6 +86,7 @@ function subscribeStudents() {
   return onSnapshot(collection(db, "students"), snap => {
     state.students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderStats();
+    maybeShowOneriler();
   });
 }
 
@@ -76,6 +105,11 @@ async function init() {
     state.categories = [];
   }
 
+  window.addEventListener("tetz:tanis", (event) => {
+    const { ogrenciId, hedefId } = event.detail ?? {};
+    console.info("Tanış isteği:", { ogrenciId, hedefId });
+  });
+
   onAuthStateChanged(auth, user => {
     state.user = user;
     if (!user) {
@@ -84,6 +118,7 @@ async function init() {
     }
     subscribeStudents();
     subscribeMatches();
+    maybeShowOneriler();
   });
 
   renderMap();

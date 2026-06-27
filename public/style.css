@@ -157,11 +157,84 @@ textarea:focus {
   border-color: var(--primary);
 }
 
+.oneriler h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.eslesme-kartlari {
+  display: grid;
+  gap: 12px;
+}
+
+.eslesme-kart {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.eslesme-kart__ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.eslesme-kart__ust h3 {
+  font-size: 16px;
+}
+
+.eslesme-kart__puan {
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.eslesme-kart__okul {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.eslesme-kart__etiket-baslik {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.etiket-listesi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.etiket {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.btn-tanis {
+  width: 100%;
+  margin-top: 12px;
+}
+
 @media (max-width: 800px) {
   main {
     grid-template-columns: 1fr;
   }
   #map-container {
     min-height: 320px;
+  }
+  .eslesme-kart__ust {
+    flex-direction: column;
   }
 }
