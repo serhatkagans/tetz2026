@@ -33,6 +33,7 @@
       setDoc,
       addDoc,
       updateDoc,
+      deleteDoc,
       query,
       where,
       onSnapshot,
@@ -41,6 +42,8 @@
     import {
       getAuth,
       signInAnonymously,
+      signInWithEmailAndPassword,
+      signOut,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -62,10 +65,10 @@ appId: "1:87940983220:web:b38e5f28ace0576df06ae1"
       db,
       auth,
       firestore: {
-        collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
+        collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
         query, where, onSnapshot, serverTimestamp
       },
-      authApi: { signInAnonymously, onAuthStateChanged }
+      authApi: { signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged }
     };
   </script>
 

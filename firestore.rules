@@ -5,10 +5,10 @@ service cloud.firestore {
 
     match /students/{studentId} {
       allow read: if true;
-      allow create: if request.resource.data.onaylandi == false;
-      allow update: if resource.data.onaylandi == false
-        && request.resource.data.onaylandi == false;
-      allow delete: if false;
+      allow create: if request.resource.data.onaylandi == false || (request.auth != null && request.auth.token.firebase.sign_in_provider == 'password');
+      allow update: if (resource.data.onaylandi == false && request.resource.data.onaylandi == false)
+        || (request.auth != null && request.auth.token.firebase.sign_in_provider == 'password');
+      allow delete: if request.auth != null && request.auth.token.firebase.sign_in_provider == 'password';
     }
 
     match /matches/{matchId} {
