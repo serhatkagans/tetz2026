@@ -1,3 +1,5 @@
+import { renderStats as renderStatsCards } from "./components/stats.js";
+
 const { db, auth, firestore, authApi } = window.tetz;
 const {
   collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
@@ -30,14 +32,7 @@ async function loadCategories() {
 }
 
 function renderStats() {
-  const total = state.students.length;
-  const approved = state.students.filter(s => s.onaylandi).length;
-  const matchCount = state.matches.length;
-  els.stats.innerHTML = `
-    <span><strong>${total}</strong> öğrenci</span>
-    <span><strong>${approved}</strong> onaylı</span>
-    <span><strong>${matchCount}</strong> eşleşme</span>
-  `;
+  renderStatsCards("stats-container");
 }
 
 function renderContent() {

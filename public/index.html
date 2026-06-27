@@ -9,17 +9,44 @@
 </head>
 <body>
   <div id="app">
-    <header id="app-header">
-      <h1>TETZ2026</h1>
-      <p class="tagline">İlgi alanlarına göre akıllı öğrenci eşleştirme</p>
+    <nav class="navbar" aria-label="Ana navigasyon">
+      <div class="navbar-inner">
+        <a class="navbar-brand" href="#">
+          <span class="brand-mark" aria-hidden="true">T</span>
+          <span class="brand-text">TETZ<span class="brand-accent">2026</span></span>
+        </a>
+        <ul class="navbar-links">
+          <li><a href="#map-container">Harita</a></li>
+          <li><a href="#content-area">Keşfet</a></li>
+          <li><a href="#stats-bar">İstatistikler</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <header class="hero" id="app-header">
+      <div class="hero-inner">
+        <p class="hero-badge">Öğrenci Networking Platformu</p>
+        <h1 class="hero-title">TETZ2026</h1>
+        <p class="hero-lead">
+          İlgi alanlarına göre seni en uygun öğrencilerle eşleştiren akıllı networking deneyimi.
+        </p>
+        <p class="hero-desc">
+          Yapay zekadan robotiğe, ortak tutkularında yeni bağlantılar kur ve gerçek buluşmalar planla.
+        </p>
+      </div>
     </header>
 
-    <main>
-      <div id="map-container"></div>
-      <div id="content-area"></div>
+    <main class="main-content">
+      <div id="map-container" aria-label="Harita alanı"></div>
+      <div id="content-area" aria-label="İçerik alanı"></div>
     </main>
 
-    <footer id="stats-bar"></footer>
+    <footer id="stats-bar" class="stats-section" aria-label="Platform istatistikleri">
+      <div class="stats-section-inner">
+        <h2 class="stats-heading">Canlı İstatistikler</h2>
+        <div id="stats-container" class="stats-grid"></div>
+      </div>
+    </footer>
   </div>
 
   <script type="module">
