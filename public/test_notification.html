@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TETZ Connect — İletişim Konsolu</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --bg: #07080a;
+      --surface: #0e1014;
+      --surface-2: #14171d;
+      --border: #22252d;
+      --border-focus: #c5a880;
+      
+      --text: #f5f5f7;
+      --text-muted: #7c7c82;
+      
+      --primary: #c5a880; /* Şampanya Altını */
+      --primary-hover: #dfc59e;
+      --accent: #be123c; /* Yakut Kırmızısı */
+      --success: #10b981;
+      
+      --radius: 8px;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background: radial-gradient(circle at 50% 0%, #151821 0%, var(--bg) 80%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
+    }
+
+    .brand-section h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .brand-section p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 4px 0 0 0;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--primary);
+      box-shadow: 0 2px 10px rgba(197, 168, 128, 0.1);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--primary);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 4px;
+    }
+
+    .panel-section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    input {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    .btn {
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn:hover {
+      background: var(--border);
+      border-color: var(--text-muted);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--surface);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .badge-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .badge-label {
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    /* Sağ Bölüm: Sohbet Görünümü */
+    main.chat-view {
+      height: 620px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .map-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-align: center;
+      padding: 40px;
+    }
+
+    /* Arayüz Override Kuralları (Lüks Stil) */
+    .tetz-chat-container {
+      border: none !important;
+      border-radius: 0 !important;
+      height: 100% !important;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      body {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand-section">
+        <h1>TETZ Connect</h1>
+        <p>Ekip 7 — İletişim Konsolu</p>
+      </div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span>Yerel Simülasyon Aktif</span>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <!-- Ayarlar ve Kontroller -->
+      <aside class="panel">
+        <!-- Konsol Ayarları -->
+        <div class="panel-section">
+          <div class="panel-title">Konsol Yapılandırması</div>
+          <div class="form-group">
+            <label for="student-id-input">ÖĞRENCİ ID</label>
+            <input type="text" id="student-id-input" value="ogrenci_123" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="meeting-id-input">GÖRÜŞME ID</label>
+            <input type="text" id="meeting-id-input" value="meeting_test_2" autocomplete="off">
+          </div>
+          <button id="btn-init-chat" class="btn btn-primary">Konsolu Başlat</button>
+        </div>
+
+        <!-- Bildirim Göstergesi -->
+        <div class="panel-section">
+          <div class="panel-title">Bildirim Rozeti</div>
+          <div class="badge-display">
+            <span class="badge-label">Gelen Talepler</span>
+            <div id="notification-badge-container"></div>
+          </div>
+        </div>
+
+        <!-- Eylemler -->
+        <div class="panel-section">
+          <div class="panel-title">Simülasyon Eylemleri</div>
+          <button id="btn-create-pending-meeting" class="btn">Görüşme Talebi Gönder</button>
+          <button id="btn-accept-meeting" class="btn">Talebi Onayla</button>
+          <button id="btn-add-dummy-message" class="btn">Simüle Mesaj Al</button>
+        </div>
+      </aside>
+
+      <!-- Mesajlaşma Arayüzü -->
+      <main class="chat-view" id="chat-container-area">
+        <div class="map-placeholder">Odaya bağlanmak için lütfen sol taraftan "Konsolu Başlat" butonuna tıklayın.</div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Firebase & window.tetz Kurulumu -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
+      query, where, onSnapshot, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      getAuth, signInAnonymously, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_w65kktgOnE2AUDQDU4OmoRmiYUvXfhg",
+      authDomain: "tetz2026.firebaseapp.com",
+      projectId: "tetz2026",
+      storageBucket: "tetz2026.firebasestorage.app",
+      messagingSenderId: "87940983220",
+      appId: "1:87940983220:web:b38e5f28ace0576df06ae1"
+    };
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      window.tetz = {
+        app, db, auth,
+        firestore: {
+          collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
+          query, where, onSnapshot, serverTimestamp
+        },
+        authApi: { signInAnonymously, onAuthStateChanged }
+      };
+
+      signInAnonymously(auth).catch(err => {
+        console.warn("[TETZ] Firebase kimlik doğrulaması atlandı, çevrimdışı simülasyon kullanılıyor.");
+      });
+    } catch (err) {
+      console.warn("[TETZ] Çevrimdışı mod başlatılıyor.");
+    }
+  </script>
+
+  <!-- Entegrasyon Olayları -->
+  <script type="module">
+    import { initNotifications, renderMesajlasma } from './components/notification.js';
+
+    let notificationUnsubscribe = null;
+
+    // Yardımcı Mock DB Yazıcıları
+    const writeMockMeeting = (meeting) => {
+      const meetings = JSON.parse(localStorage.getItem("tetz_meetings") || "[]");
+      const index = meetings.findIndex(m => m.id === meeting.id);
+      if (index !== -1) {
+        meetings[index] = { ...meetings[index], ...meeting };
+      } else {
+        meetings.push(meeting);
+      }
+      localStorage.setItem("tetz_meetings", JSON.stringify(meetings));
+      window.dispatchEvent(new CustomEvent("tetz-db-update-meetings"));
+    };
+
+    const writeMockMessage = (meetingId, message) => {
+      const messages = JSON.parse(localStorage.getItem(`tetz_messages_${meetingId}`) || "[]");
+      messages.push(message);
+      localStorage.setItem(`tetz_messages_${meetingId}`, JSON.stringify(messages));
+      window.dispatchEvent(new CustomEvent(`tetz-db-update-messages-${meetingId}`));
+    };
+
+    // Konsolu Başlat (Bildirim ve Sohbet Kurulumu)
+    const runConsole = () => {
+      const studentId = document.getElementById("student-id-input").value.trim();
+      const meetingId = document.getElementById("meeting-id-input").value.trim();
+      if (!studentId || !meetingId) return;
+
+      if (notificationUnsubscribe) notificationUnsubscribe();
+
+      // Bildirim rozetini başlat
+      const badgeContainer = document.getElementById("notification-badge-container");
+      badgeContainer.innerHTML = "";
+      notificationUnsubscribe = initNotifications("notification-badge-container", studentId);
+
+      // Sohbet alanını başlat
+      renderMesajlasma("chat-container-area", meetingId, studentId);
+    };
+
+    document.getElementById("btn-init-chat").addEventListener("click", runConsole);
+
+    // Otomatik başlat
+    window.addEventListener("load", () => {
+      setTimeout(runConsole, 300);
+    });
+
+    // Simüle Görüşme İsteği Ekle
+    document.getElementById("btn-create-pending-meeting").addEventListener("click", async () => {
+      const meetingId = document.getElementById("meeting-id-input").value.trim();
+      const studentId = document.getElementById("student-id-input").value.trim();
+
+      const meetingDoc = {
+        id: meetingId,
+        alici: studentId,
+        gonderen: "ekip_7_mentor",
+        durum: "bekliyor",
+        olusturmaTarihi: new Date().toISOString()
+      };
+
+      writeMockMeeting(meetingDoc);
+
+      try {
+        if (window.tetz && window.tetz.db) {
+          const db = window.tetz.db;
+          const { doc, setDoc } = window.tetz.firestore;
+          await setDoc(doc(db, "meetings", meetingId), {
+            alici: studentId,
+            gonderen: "ekip_7_mentor",
+            durum: "bekliyor"
+          });
+        }
+      } catch (err) {
+        console.warn("Firestore yazımı atlandı:", err.message);
+      }
+    });
+
+    // Görüşmeyi Onayla (Kabul Et)
+    document.getElementById("btn-accept-meeting").addEventListener("click", async () => {
+      const meetingId = document.getElementById("meeting-id-input").value.trim();
+
+      writeMockMeeting({ id: meetingId, durum: "kabul" });
+
+      try {
+        if (window.tetz && window.tetz.db) {
+          const db = window.tetz.db;
+          const { doc, updateDoc } = window.tetz.firestore;
+          await updateDoc(doc(db, "meetings", meetingId), {
+            durum: "kabul"
+          });
+        }
+      } catch (err) {
+        console.warn("Firestore güncellemesi atlandı:", err.message);
+      }
+
+      runConsole();
+    });
+
+    // Simüle Mesaj Al
+    document.getElementById("btn-add-dummy-message").addEventListener("click", async () => {
+      const meetingId = document.getElementById("meeting-id-input").value.trim();
+
+      const messageDoc = {
+        id: "msg_" + Date.now(),
+        gonderen: "ekip_7_mentor",
+        metin: "Merhaba! Görüşme odası aktif hale getirildi, projeyi birlikte inceleyebiliriz.",
+        tarih: new Date().toISOString()
+      };
+
+      writeMockMessage(meetingId, messageDoc);
+
+      try {
+        if (window.tetz && window.tetz.db) {
+          const db = window.tetz.db;
+          const { collection, addDoc, serverTimestamp } = window.tetz.firestore;
+          await addDoc(collection(db, "messages", meetingId, "mesajlar"), {
+            gonderen: "ekip_7_mentor",
+            metin: "Merhaba! Görüşme odası aktif hale getirildi, projeyi birlikte inceleyebiliriz.",
+            tarih: serverTimestamp()
+          });
+        }
+      } catch (err) {
+        console.warn("Firestore mesaj yazımı atlandı:", err.message);
+      }
+    });
+  </script>
+</body>
+</html>
