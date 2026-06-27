@@ -1,5 +1,6 @@
 import { renderOneriler, eslesmeleriKaydet } from "./components/matching.js";
 import { FuarKatPlani } from "./components/map.js";
+import { renderStats as renderStatsCards } from "./components/stats.js";
 
 const { db, auth, firestore, authApi } = window.tetz;
 const {
@@ -33,15 +34,7 @@ async function loadCategories() {
 }
 
 function renderStats() {
-  const total = state.students.length;
-  const approved = state.students.filter(s => s.onaylandi).length;
-  const matchCount = state.matches.length;
-  els.stats.innerHTML = `
-    <span><strong>${total}</strong> öğrenci</span>
-    <span><strong>${approved}</strong> onaylı</span>
-    <span><strong>${matchCount}</strong> eşleşme</span>
-    <span><strong>${state.categories.length}</strong> ilgi alanı</span>
-  `;
+  renderStatsCards("stats-container");
 }
 
 function getCurrentOgrenciId() {
