@@ -3,25 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="TETZ2026 - Öğrencileri ilgi alanlarına göre akıllıca eşleştiren networking platformu" />
-  <title>TETZ2026 — Öğrenci Networking Platformu</title>
+  <meta name="description" content="TETZ2026 — Öğrencileri ilgi alanlarına göre bir araya getiren platform" />
+  <title>TETZ2026 — Öğrenci Eşleştirme</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- Ana uygulama kabı -->
   <div id="app">
+
+    <!-- Üst başlık -->
     <header id="app-header">
       <h1>TETZ2026</h1>
-      <p class="tagline">İlgi alanlarına göre akıllı öğrenci eşleştirme</p>
+      <p class="tagline">İlgi alanlarına göre öğrenci eşleştirme platformu</p>
     </header>
 
     <main>
-      <div id="map-container"></div>
-      <div id="content-area"></div>
+
+      <!-- Sol: Fuar kat planı (map.js buraya çizilir) -->
+      <section id="map-container" aria-label="Fuar kat planı">
+        <p class="yukleniyor">Harita yükleniyor…</p>
+      </section>
+
+      <!-- Sağ: Kullanım rehberi ve bilgiler -->
+      <section id="content-area" aria-label="Bilgi alanı">
+        <div class="hosgeldin">
+          <h2>Hoş geldin!</h2>
+          <p class="aciklama">
+            Soldaki renkli kutular, fuardaki ilgi alanı standlarını temsil eder.
+            Bir standa tıkladığında o alandaki öğrencileri görebilirsin.
+          </p>
+          <ol class="adimlar">
+            <li>Soldan bir ilgi alanı standına tıkla</li>
+            <li>Sağ panelde o standdaki öğrenciler listelenir</li>
+            <li>Her kartta ad, okul, sınıf ve ilgi alanları yazar</li>
+          </ol>
+        </div>
+      </section>
+
     </main>
 
-    <footer id="stats-bar"></footer>
+    <!-- Alt: Canlı istatistikler -->
+    <footer id="stats-bar" aria-label="Platform istatistikleri">
+      <span>Veriler yükleniyor…</span>
+    </footer>
+
   </div>
 
+  <!--
+    ADIM 1: Firebase bağlantısı
+    Bu blok veritabanı ve giriş işlemlerini hazırlar.
+    Diğer dosyalar window.tetz üzerinden erişir.
+  -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -45,12 +78,12 @@
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
-     apiKey: "AIzaSyD_w65kktgOnE2AUDQDU4OmoRmiYUvXfhg",
-authDomain: "tetz2026.firebaseapp.com",
-projectId: "tetz2026",
-storageBucket: "tetz2026.firebasestorage.app",
-messagingSenderId: "87940983220",
-appId: "1:87940983220:web:b38e5f28ace0576df06ae1"
+      apiKey: "AIzaSyD_w65kktgOnE2AUDQDU4OmoRmiYUvXfhg",
+      authDomain: "tetz2026.firebaseapp.com",
+      projectId: "tetz2026",
+      storageBucket: "tetz2026.firebasestorage.app",
+      messagingSenderId: "87940983220",
+      appId: "1:87940983220:web:b38e5f28ace0576df06ae1"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -69,6 +102,8 @@ appId: "1:87940983220:web:b38e5f28ace0576df06ae1"
     };
   </script>
 
+  <!-- ADIM 2: Uygulama mantığı -->
   <script type="module" src="app.js"></script>
+
 </body>
 </html>

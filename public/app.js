@@ -1,96 +1,137 @@
+/**
+ * ============================================================
+ * app.js — Ana uygulama
+ * ============================================================
+ *
+ * Sayfa açılınca sırasıyla şunlar olur:
+ *   1. Kategori listesi yüklenir
+ *   2. Firebase'e anonim giriş yapılır
+ *   3. Fuar kat planı çizilir (map.js)
+ *   4. Öğrenci ve eşleşme sayıları canlı güncellenir
+ */
+
+import { FuarKatPlani } from "./components/map.js";
+
 const { db, auth, firestore, authApi } = window.tetz;
-const {
-  collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
-  query, where, onSnapshot, serverTimestamp
-} = firestore;
+const { collection, onSnapshot } = firestore;
 const { signInAnonymously, onAuthStateChanged } = authApi;
 
-const state = {
-  user: null,
-  categories: [],
-  students: [],
-  matches: []
+// ── Uygulama durumu ────────────────────────────────────────
+
+const durum = {
+  kullanici: null,
+  kategoriler: [],
+  ogrenciler: [],
+  eslesmeler: []
 };
 
-const els = {
-  app: document.getElementById("app"),
-  map: document.getElementById("map-container"),
-  content: document.getElementById("content-area"),
-  stats: document.getElementById("stats-bar")
+// ── HTML elemanları ────────────────────────────────────────
+
+const elemanlar = {
+  harita: document.getElementById("map-container"),
+  bilgi: document.getElementById("content-area"),
+  istatistik: document.getElementById("stats-bar")
 };
 
-async function loadCategories() {
-  const res = await fetch("../data/categories.json");
-  if (!res.ok) {
-    const local = await fetch("data/categories.json").catch(() => null);
-    if (local && local.ok) return local.json();
-    throw new Error("categories.json yüklenemedi");
+// ── Veri yükleme ───────────────────────────────────────────
+
+async function kategorileriYukle() {
+  const yollar = ["data/categories.json", "../data/categories.json"];
+  for (const yol of yollar) {
+    try {
+      const cevap = await fetch(yol);
+      if (cevap.ok) return cevap.json();
+    } catch {
+      /* sonraki yolu dene */
+    }
   }
-  return res.json();
+  throw new Error("Kategori listesi yüklenemedi");
 }
 
-function renderStats() {
-  const total = state.students.length;
-  const approved = state.students.filter(s => s.onaylandi).length;
-  const matchCount = state.matches.length;
-  els.stats.innerHTML = `
-    <span><strong>${total}</strong> öğrenci</span>
-    <span><strong>${approved}</strong> onaylı</span>
-    <span><strong>${matchCount}</strong> eşleşme</span>
+// ── Ekrana yazma ───────────────────────────────────────────
+
+function istatistikleriGuncelle() {
+  const toplam = durum.ogrenciler.length;
+  const onayli = durum.ogrenciler.filter(o => o.onaylandi).length;
+  const eslesme = durum.eslesmeler.length;
+
+  elemanlar.istatistik.innerHTML = `
+    <span><strong>${toplam}</strong> kayıtlı öğrenci</span>
+    <span><strong>${onayli}</strong> onaylı öğrenci</span>
+    <span><strong>${eslesme}</strong> eşleşme</span>
+    <span><strong>${durum.kategoriler.length}</strong> ilgi alanı</span>
   `;
 }
 
-function renderContent() {
-  els.content.innerHTML = `
-    <section class="welcome">
-      <h2>Hoş geldin!</h2>
-      <p>İlgi alanlarına göre seni başka öğrencilerle eşleştireceğiz.</p>
-      <p class="muted">Kategori sayısı: ${state.categories.length}</p>
-    </section>
-  `;
+async function haritayiCiz() {
+  await FuarKatPlani("map-container");
 }
 
-function renderMap() {
-  els.map.innerHTML = `<div class="map-placeholder">Harita alanı</div>`;
-}
+// ── Firestore dinleyicileri (canlı güncelleme) ─────────────
 
-function subscribeStudents() {
-  return onSnapshot(collection(db, "students"), snap => {
-    state.students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderStats();
+function ogrencileriDinle() {
+  return onSnapshot(collection(db, "students"), anlik => {
+    durum.ogrenciler = anlik.docs.map(b => ({ id: b.id, ...b.data() }));
+    istatistikleriGuncelle();
   });
 }
 
-function subscribeMatches() {
-  return onSnapshot(collection(db, "matches"), snap => {
-    state.matches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderStats();
+function eslesmeleriDinle() {
+  return onSnapshot(collection(db, "matches"), anlik => {
+    durum.eslesmeler = anlik.docs.map(b => ({ id: b.id, ...b.data() }));
+    istatistikleriGuncelle();
   });
 }
 
-async function init() {
+// ── Başlat ─────────────────────────────────────────────────
+
+async function baslat() {
+  // 1) Kategorileri yükle
   try {
-    state.categories = await loadCategories();
-  } catch (err) {
-    console.error(err);
-    state.categories = [];
+    durum.kategoriler = await kategorileriYukle();
+  } catch (hata) {
+    console.error("Kategori hatası:", hata);
+    durum.kategoriler = [];
   }
 
-  onAuthStateChanged(auth, user => {
-    state.user = user;
-    if (!user) {
-      signInAnonymously(auth).catch(err => console.error("Anonim giriş hatası:", err));
+  // 2) Firebase girişi ve canlı veri dinleme
+  onAuthStateChanged(auth, kullanici => {
+    durum.kullanici = kullanici;
+
+    if (!kullanici) {
+      signInAnonymously(auth).catch(hata =>
+        console.error("Giriş hatası:", hata)
+      );
       return;
     }
-    subscribeStudents();
-    subscribeMatches();
+
+    ogrencileriDinle();
+    eslesmeleriDinle();
   });
 
-  renderMap();
-  renderContent();
-  renderStats();
+  // 3) Haritayı çiz
+  try {
+    await haritayiCiz();
+  } catch (hata) {
+    console.error("Harita hatası:", hata);
+    if (elemanlar.harita) {
+      elemanlar.harita.innerHTML = `
+        <div class="hata-mesaji">
+          <p><strong>Harita yüklenemedi</strong></p>
+          <p>${hata.message || "Bilinmeyen hata"}</p>
+          <p class="hata-mesaji__ipucu">
+            index.html dosyasını doğrudan açma — bir sunucu üzerinden aç:
+            <code>firebase serve</code> veya VS Code Live Server
+          </p>
+        </div>
+      `;
+    }
+  }
+
+  // 4) İlk istatistikleri göster
+  istatistikleriGuncelle();
 }
 
-init();
+baslat();
 
-export { state, db, auth };
+export { durum as state, db, auth };
