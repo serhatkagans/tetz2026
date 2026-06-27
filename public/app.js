@@ -2,6 +2,8 @@ import { renderOneriler, eslesmeleriKaydet } from "./components/matching.js";
 import { FuarKatPlani } from "./components/map.js";
 import { renderStats as renderStatsCards } from "./components/stats.js";
 import { renderModerasyon } from "./components/moderation.js";
+import { renderRegisterForm } from "./components/register.js";
+import { talepGonder } from "./components/meeting.js";
 
 const { db, auth, firestore, authApi } = window.tetz;
 const {
@@ -40,38 +42,50 @@ function renderStats() {
 
 function getCurrentOgrenciId() {
   if (!state.user) return null;
-  const ogrenci = state.students.find((s) => s.id === state.user.uid);
+  const ogrenci = state.students.find(
+    (s) => s.id === state.user.uid || s.uid === state.user.uid
+  );
   return ogrenci?.id ?? null;
 }
 
-let onerilerYuklendi = false;
+// Kullanıcının kayıt durumu değiştiğinde içeriği yeniden çizmek için izlenir
+let kayitliMiydi = false;
+// Eşleşmeler oturumda yalnızca bir kez kaydedilsin (her gezinmede tekrar yazılmasın)
+let eslesmelerKaydedildi = false;
 
 async function showOneriler(ogrenciId) {
-  if (!ogrenciId || onerilerYuklendi) return;
-  onerilerYuklendi = true;
+  if (!ogrenciId) return;
   try {
-    await eslesmeleriKaydet(ogrenciId);
+    if (!eslesmelerKaydedildi) {
+      eslesmelerKaydedildi = true;
+      await eslesmeleriKaydet(ogrenciId);
+    }
     await renderOneriler("content-area", ogrenciId);
   } catch (err) {
-    onerilerYuklendi = false;
+    eslesmelerKaydedildi = false;
     console.error("Eşleşme önerileri yüklenemedi:", err);
   }
 }
 
-function maybeShowOneriler() {
-  const ogrenciId = getCurrentOgrenciId();
-  if (ogrenciId) showOneriler(ogrenciId);
-}
-
+// İçerik alanını kullanıcının durumuna göre çizer:
+//  - Kayıtlı öğrenci  → eşleşme önerileri
+//  - Giriş yapmış ama kayıtsız → kayıt formu
+//  - Henüz oturum yok → karşılama/yükleniyor
 function renderContent() {
-  if (getCurrentOgrenciId()) return;
-  els.content.innerHTML = `
-    <section class="welcome">
-      <h2>Hoş geldin!</h2>
-      <p>İlgi alanlarına göre seni başka öğrencilerle eşleştireceğiz.</p>
-      <p class="muted">Kategori sayısı: ${state.categories.length}</p>
-    </section>
-  `;
+  const ogrenciId = getCurrentOgrenciId();
+  if (ogrenciId) {
+    showOneriler(ogrenciId);
+  } else if (state.user) {
+    renderRegisterForm("content-area");
+  } else {
+    els.content.innerHTML = `
+      <section class="welcome">
+        <h2>Hoş geldin!</h2>
+        <p>İlgi alanlarına göre seni başka öğrencilerle eşleştireceğiz.</p>
+        <p class="muted">Yükleniyor…</p>
+      </section>
+    `;
+  }
 }
 
 async function renderMap() {
@@ -98,7 +112,13 @@ function subscribeStudents() {
   return onSnapshot(collection(db, "students"), snap => {
     state.students = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderStats();
-    maybeShowOneriler();
+    // Sadece kayıt durumu değiştiğinde içeriği yeniden çiz; aksi halde
+    // kullanıcı formu doldururken her snapshot'ta form sıfırlanırdı.
+    const kayitli = !!getCurrentOgrenciId();
+    if (kayitli !== kayitliMiydi) {
+      kayitliMiydi = kayitli;
+      if (window.location.hash !== "#moderasyon") renderContent();
+    }
   });
 }
 
@@ -160,7 +180,10 @@ async function init() {
 
   window.addEventListener("tetz:tanis", (event) => {
     const { ogrenciId, hedefId } = event.detail ?? {};
-    console.info("Tanış isteği:", { ogrenciId, hedefId });
+    if (ogrenciId && hedefId) {
+      // Buluşma talebini meeting.js üzerinden gönder (kullanıcıya geri bildirim verir)
+      talepGonder(ogrenciId, hedefId);
+    }
   });
 
   onAuthStateChanged(auth, user => {
@@ -171,7 +194,8 @@ async function init() {
     }
     subscribeStudents();
     subscribeMatches();
-    maybeShowOneriler();
+    kayitliMiydi = !!getCurrentOgrenciId();
+    if (window.location.hash !== "#moderasyon") renderContent();
   });
 
   await renderMap();

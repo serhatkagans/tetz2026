@@ -101,8 +101,13 @@ export async function renderRegisterForm(containerId) {
       submitBtn.disabled = true;
       submitBtn.textContent = "Kaydediliyor...";
       
-      const { db, firestore } = window.tetz;
-      const { collection, addDoc, serverTimestamp } = firestore;
+      const { db, auth, firestore } = window.tetz;
+      const { doc, setDoc, serverTimestamp } = firestore;
+
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("Oturum bulunamadı, lütfen sayfayı yenileyin.");
+      }
 
       const studentData = {
         ad: adSoyad,
@@ -111,11 +116,13 @@ export async function renderRegisterForm(containerId) {
         ilgiAlanlari: ilgiAlanlari,
         bulusmaKabul: bulusmaKabul,
         onaylandi: false, // ÖNEMLİ: Her zaman false olacak
+        uid: user.uid,
         kayitTarihi: serverTimestamp()
       };
 
-      // Firestore 'students' koleksiyonuna ekle
-      await addDoc(collection(db, 'students'), studentData);
+      // Firestore 'students' koleksiyonuna kullanıcı kimliğiyle yaz.
+      // Doküman ID = auth uid → eşleştirme bu kullanıcıyı tanıyabilsin.
+      await setDoc(doc(db, 'students', user.uid), studentData);
       
       // Başarı mesajı
       messageEl.textContent = 'Kaydınız alındı';
